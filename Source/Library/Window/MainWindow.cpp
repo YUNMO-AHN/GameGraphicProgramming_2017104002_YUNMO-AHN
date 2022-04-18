@@ -119,17 +119,45 @@ namespace library
         }
         case WM_KEYDOWN:
             switch (wParam) {
+            case 0x57:
+                m_directions.bFront = lParam & 0x40000000;
+                break;
+            case 0x41:
+                m_directions.bLeft = lParam & 0x40000000;
+                break;
+            case 0x53:
+                m_directions.bBack = lParam & 0x40000000;
+                break;
+            case 0x44:
+                m_directions.bRight = lParam & 0x40000000;
+                break;
             case VK_SPACE:
-                m_directions.bUp = TRUE;
-            case VK_SHIFT :
-                m_directions.bDown = TRUE;
+                m_directions.bUp = lParam & 0x40000000;
+                break;
+            case VK_SHIFT:
+                m_directions.bDown = lParam & 0x40000000;
+                break;
             }
         case WM_KEYUP:
             switch (wParam) {
+            case 0x57:
+                    m_directions.bFront = !(lParam & 0x40000000);
+                    break;
+            case 0x41:
+                    m_directions.bLeft = !(lParam & 0x40000000);
+                    break;
+            case 0x53:
+                    m_directions.bBack = !(lParam & 0x40000000);
+                    break;
+            case 0x44:
+                    m_directions.bRight = !(lParam & 0x40000000);
+                    break;
             case VK_SPACE:
-                m_directions.bUp = FALSE;
+                    m_directions.bUp = !(lParam & 0x40000000);
+                    break;
             case VK_SHIFT:
-                m_directions.bDown = FALSE;
+                    m_directions.bDown = !(lParam & 0x40000000);
+                    break;
             }
         case WM_PAINT:
             hdc = BeginPaint(m_hWnd, &ps);

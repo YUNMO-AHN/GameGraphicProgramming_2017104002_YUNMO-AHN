@@ -12,7 +12,7 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     Camera::Camera(_In_ const XMVECTOR& position) :
         m_moveBackForward(0.0f), m_moveLeftRight(0.0f), m_moveUpDown(0.0f),
-        m_travelSpeed(1.0f), m_rotationSpeed(1.0f), m_eye(position),
+        m_travelSpeed(2.0f), m_rotationSpeed(1.0f), m_eye(position),
         m_rotation(XMMatrixIdentity()), m_view(XMMatrixIdentity())
     {
     }
