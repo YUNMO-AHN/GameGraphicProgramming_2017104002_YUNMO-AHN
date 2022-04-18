@@ -86,6 +86,8 @@ namespace library
 
 				deltaTime = static_cast<FLOAT> (elapsedMicroseconds.QuadPart) / 1000000.0f;
 
+				m_renderer->HandleInput(m_mainWindow->GetDirections(), m_mainWindow->GetMouseRelativeMovement(), deltaTime);
+				m_mainWindow->ResetMouseMovement();
 				m_renderer->Update(deltaTime);
 				m_renderer->Render();
 			}

@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\Game">
+      <UniqueIdentifier>{b845b071-94b5-4fec-96f8-510a633dd20f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Renderer">
+      <UniqueIdentifier>{9d774b2a-f26c-41d0-8638-082c5f80be78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Window">
+      <UniqueIdentifier>{b668bc15-3a8f-4085-932e-efdd3d267717}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Window">
+      <UniqueIdentifier>{acd6812a-4c38-4923-8876-d5163dcb1ba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Game">
+      <UniqueIdentifier>{3ff9298e-1ce6-4229-8a7f-96b8dff9f371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Renderer">
+      <UniqueIdentifier>{97f6f0fc-4552-487b-97b8-ba11b83bf6c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Shaders">
+      <UniqueIdentifier>{35226c71-661a-43a5-b547-fb889385182c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Shaders">
+      <UniqueIdentifier>{8a78eb71-576c-435a-a5b0-b135c247a35a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\GameShaders">
+      <UniqueIdentifier>{8fe15c00-9581-48b6-bab8-83777464116f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Cube">
+      <UniqueIdentifier>{e5940d7d-8437-4e70-b97a-32e0bde336d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Cube">
+      <UniqueIdentifier>{4b8321d0-b005-4647-803a-1fc91e409734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Camera">
+      <UniqueIdentifier>{7e963c11-e3f8-46cd-8777-c4b49be20f22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Camera">
+      <UniqueIdentifier>{62a30cf8-f27f-48b2-afc5-df5d7a81167c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Window\BaseWindow.h">
+      <Filter>헤더 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window\MainWindow.h">
+      <Filter>헤더 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Game.h">
+      <Filter>헤더 파일\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderer.h">
+      <Filter>헤더 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DataTypes.h">
+      <Filter>헤더 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\PixelShader.h">
+      <Filter>헤더 파일\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\Shader.h">
+      <Filter>헤더 파일\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\VertexShader.h">
+      <Filter>헤더 파일\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderable.h">
+      <Filter>헤더 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\BaseCube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\CustomCube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\CenterCube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\OrbitCube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Camera.h">
+      <Filter>헤더 파일\Camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Game\Game.cpp">
+      <Filter>소스 파일\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Renderer.cpp">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Window\MainWindow.cpp">
+      <Filter>소스 파일\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\Shader.cpp">
+      <Filter>소스 파일\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\VertexShader.cpp">
+      <Filter>소스 파일\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\PixelShader.cpp">
+      <Filter>소스 파일\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Renderable.cpp">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\BaseCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\CustomCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\CenterCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\OrbitCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\Camera.cpp">
+      <Filter>소스 파일\Camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Game\Shaders\Shaders.fxh">
+      <Filter>헤더 파일\GameShaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Game\Shaders\VS.hlsl">
+      <Filter>헤더 파일\GameShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Game\Shaders\PS.hlsl">
+      <Filter>헤더 파일\GameShaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
