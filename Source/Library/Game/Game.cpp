@@ -61,34 +61,38 @@ namespace library
 
 	INT Game::Run() {
 
+		LARGE_INTEGER countsPerSecond, startTime, stopTime;
+		float elapsedTime;
+
 		MSG msg = { 0 };
-		LARGE_INTEGER startingTime, endingTime, elapsedMicroseconds;
-		LARGE_INTEGER frequency;
-		FLOAT deltaTime;
 
-		QueryPerformanceFrequency(&frequency);
-		QueryPerformanceCounter(&startingTime);
+		QueryPerformanceFrequency(&countsPerSecond);
+		QueryPerformanceCounter(&startTime);
 
-		while (WM_QUIT != msg.message) {
-			if (PeekMessage(&msg, nullptr, 0u, 0u, PM_REMOVE)) {
+		while (WM_QUIT != msg.message)
+		{
+
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+			else
+			{
+				QueryPerformanceCounter(&stopTime);
 
-			else {
+				elapsedTime = (float)(stopTime.QuadPart - startTime.QuadPart);
+				elapsedTime /= (float)countsPerSecond.QuadPart;
 
-				QueryPerformanceCounter(&endingTime);
-				elapsedMicroseconds.QuadPart = endingTime.QuadPart - startingTime.QuadPart;
-				elapsedMicroseconds.QuadPart *= 1000000;
-				elapsedMicroseconds.QuadPart /= frequency.QuadPart;
-				QueryPerformanceFrequency(&frequency);
-				QueryPerformanceCounter(&startingTime);
-
-				deltaTime = static_cast<FLOAT> (elapsedMicroseconds.QuadPart) / 1000000.0f;
-
-				m_renderer->HandleInput(m_mainWindow->GetDirections(), m_mainWindow->GetMouseRelativeMovement(), deltaTime);
+				// handle input
+				m_renderer->HandleInput(m_mainWindow->GetDirections(), m_mainWindow->GetMouseRelativeMovement(), elapsedTime);
 				m_mainWindow->ResetMouseMovement();
-				m_renderer->Update(deltaTime);
+
+				// update the renderer
+				m_renderer->Update(elapsedTime);
+				QueryPerformanceCounter(&startTime);
+
+				// renderer updates the renderables
 				m_renderer->Render();
 			}
 		}

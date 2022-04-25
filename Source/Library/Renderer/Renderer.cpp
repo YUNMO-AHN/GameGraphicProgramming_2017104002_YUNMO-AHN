@@ -23,11 +23,10 @@ namespace library
         m_depthStencil(),
         m_depthStencilView(),
         m_camera(XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f)),
-        m_projection(),
-        m_renderables(),
-        m_vertexShaders(),
-        m_pixelShaders()
-        
+        m_projection(XMMatrixIdentity()),
+        m_renderables(std::unordered_map<std::wstring, std::shared_ptr<Renderable>>()),
+        m_vertexShaders(std::unordered_map<std::wstring, std::shared_ptr<VertexShader>>()),
+        m_pixelShaders(std::unordered_map<std::wstring, std::shared_ptr<PixelShader>>())
     {
     }
 
@@ -224,34 +223,61 @@ namespace library
         m_immediateContext->RSSetViewports(1, &vp);
         m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
-
-        std::unordered_map<PCWSTR, std::shared_ptr<VertexShader>>::iterator itVS;
-        std::unordered_map<PCWSTR, std::shared_ptr<PixelShader>>::iterator itPS;
-
-        for (itVS = m_vertexShaders.begin(); itVS != m_vertexShaders.end(); itVS++) {
-            if (itVS->first == L"MainShader") {
-                itVS->second->Initialize(m_d3dDevice.Get());
-                break;
-            }
-        }
-
-        for (itPS = m_pixelShaders.begin(); itPS != m_pixelShaders.end(); itPS++) {
-            if (itPS->first == L"MainShader") {
-                itPS->second->Initialize(m_d3dDevice.Get());
-                break;
-            }
-        }
-
-        std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>::iterator it;
-
-        for (it = m_renderables.begin(); it != m_renderables.end(); it++) {
-            hr = it->second->Initialize(m_d3dDevice.Get(), m_immediateContext.Get());
-
-            if (FAILED(hr)) {
+        for (auto iVShader = m_vertexShaders.begin(); iVShader != m_vertexShaders.end(); iVShader++)
+        {
+            hr = iVShader->second->Initialize(m_d3dDevice.Get());
+            if (FAILED(hr))
+            {
                 return hr;
             }
         }
+
+        for (auto iPShader = m_pixelShaders.begin(); iPShader != m_pixelShaders.end(); iPShader++)
+        {
+            hr = iPShader->second->Initialize(m_d3dDevice.Get());
+            if (FAILED(hr))
+            {
+                return hr;
+            }
+        }
+
+        hr = m_camera.Initialize(m_d3dDevice.Get());
+
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
+        D3D11_BUFFER_DESC bd = {
+            .ByteWidth = sizeof(CBChangeOnResize),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+            .CPUAccessFlags = 0u
+        };
+
+        hr = m_d3dDevice->CreateBuffer(&bd, nullptr, m_cbChangeOnResize.GetAddressOf());
+
+        if (FAILED(hr)) {
+            return hr;
+        }
+
+        for (auto iRenderable = m_renderables.begin(); iRenderable != m_renderables.end(); iRenderable++)
+        {
+            hr = iRenderable->second->Initialize(m_d3dDevice.Get(), m_immediateContext.Get());
+            if (FAILED(hr))
+            {
+                return hr;
+            }
+        }
+
+        CBChangeOnCameraMovement cbCamera;
+        cbCamera.View = XMMatrixTranspose(m_camera.GetView());
+        m_immediateContext->UpdateSubresource(m_camera.GetConstantBuffer().Get(), 0, nullptr, &cbCamera, 0, 0);
+
+        m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
+        CBChangeOnResize cbChangesOnResize;
+        cbChangesOnResize.Projection = XMMatrixTranspose(m_projection);
+        m_immediateContext->UpdateSubresource(m_cbChangeOnResize.Get(), 0, nullptr, &cbChangesOnResize, 0, 0);
 
         return S_OK;
     }
@@ -269,7 +295,7 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     HRESULT Renderer::AddRenderable(_In_ PCWSTR pszRenderableName, _In_ const std::shared_ptr<Renderable>& renderable) {
 
-        std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>::iterator it = m_renderables.begin();
+        std::unordered_map<std::wstring, std::shared_ptr<Renderable>>::iterator it = m_renderables.begin();
 
         for (it = m_renderables.begin(); it != m_renderables.end(); it++) {
             if (it->first == pszRenderableName) {
@@ -277,7 +303,7 @@ namespace library
             }
         }
 
-        m_renderables.insert(std::pair<PCWSTR, std::shared_ptr<Renderable>>(pszRenderableName, renderable));
+        m_renderables.insert(std::pair<std::wstring, std::shared_ptr<Renderable>>(pszRenderableName, renderable));
 
         return S_OK;
     }
@@ -295,7 +321,7 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     HRESULT Renderer::AddVertexShader(_In_ PCWSTR pszVertexShaderName, _In_ const std::shared_ptr<VertexShader>& vertexShader) {
 
-        std::unordered_map<PCWSTR, std::shared_ptr<VertexShader>>::iterator it;
+        std::unordered_map<std::wstring, std::shared_ptr<VertexShader>>::iterator it;
 
         for (it = m_vertexShaders.begin(); it != m_vertexShaders.end(); it++) {
             if (it->first == pszVertexShaderName) {
@@ -303,7 +329,7 @@ namespace library
             }
         }
 
-        m_vertexShaders.insert(std::pair<PCWSTR, std::shared_ptr<VertexShader>>(pszVertexShaderName, vertexShader));
+        m_vertexShaders.insert(std::pair<std::wstring, std::shared_ptr<VertexShader>>(pszVertexShaderName, vertexShader));
 
         return S_OK;
     }
@@ -321,7 +347,7 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     HRESULT Renderer::AddPixelShader(_In_ PCWSTR pszPixelShaderName, _In_ const std::shared_ptr<PixelShader>& pixelShader) {
 
-        std::unordered_map<PCWSTR, std::shared_ptr<PixelShader>>::iterator it = m_pixelShaders.begin();
+        std::unordered_map<std::wstring, std::shared_ptr<PixelShader>>::iterator it = m_pixelShaders.begin();
 
         for (it = m_pixelShaders.begin(); it != m_pixelShaders.end(); it++) {
             if (it->first == pszPixelShaderName) {
@@ -329,7 +355,7 @@ namespace library
             }
         }
 
-        m_pixelShaders.insert(std::pair<PCWSTR, std::shared_ptr<PixelShader>>(pszPixelShaderName, pixelShader));
+        m_pixelShaders.insert(std::pair<std::wstring, std::shared_ptr<PixelShader>>(pszPixelShaderName, pixelShader));
         
         return S_OK;
     }
@@ -356,7 +382,7 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     void Renderer::Update(_In_ FLOAT deltaTime) {
 
-        std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>::iterator it;
+        std::unordered_map<std::wstring, std::shared_ptr<Renderable>>::iterator it;
 
         for (it = m_renderables.begin(); it != m_renderables.end(); it++) {
             it->second->Update(deltaTime);
@@ -375,6 +401,11 @@ namespace library
         m_immediateContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::MidnightBlue);
         m_immediateContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
+        CBChangeOnCameraMovement cbCamera = {
+            .View = XMMatrixTranspose(m_camera.GetView())
+        };
+        m_immediateContext->UpdateSubresource(m_camera.GetConstantBuffer().Get(), 0, nullptr, &cbCamera, 0, 0);
+
         for (auto it = m_renderables.begin(); it != m_renderables.end(); it++) {
 
             UINT uStride = sizeof(SimpleVertex);
@@ -384,17 +415,20 @@ namespace library
             m_immediateContext->IASetIndexBuffer(it->second->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
             m_immediateContext->IASetInputLayout(it->second->GetVertexLayout().Get());
 
-            ConstantBuffer cb = {
-                .World = XMMatrixTranspose(it->second->GetWorldMatrix()),
-                .View = XMMatrixTranspose(m_camera.GetView()),
-                .Projection = XMMatrixTranspose(m_projection)
+            CBChangesEveryFrame cb = {
+                .World = XMMatrixTranspose(it->second->GetWorldMatrix())
             };
 
             m_immediateContext->UpdateSubresource(it->second->GetConstantBuffer().Get(), 0, nullptr, &cb, 0, 0);
 
             m_immediateContext->VSSetShader(it->second->GetVertexShader().Get(), nullptr, 0);
-            m_immediateContext->VSSetConstantBuffers(0, 1, it->second->GetConstantBuffer().GetAddressOf());
+            m_immediateContext->VSSetConstantBuffers(0, 1, m_camera.GetConstantBuffer().GetAddressOf());
+            m_immediateContext->VSSetConstantBuffers(1, 1, m_cbChangeOnResize.GetAddressOf());
+            m_immediateContext->VSSetConstantBuffers(2, 1, it->second->GetConstantBuffer().GetAddressOf());
             m_immediateContext->PSSetShader(it->second->GetPixelShader().Get(), nullptr, 0);
+            m_immediateContext->PSSetConstantBuffers(2, 1, it->second->GetConstantBuffer().GetAddressOf());
+            m_immediateContext->PSSetShaderResources(0, 1, it->second->GetTextureResourceView().GetAddressOf());
+            m_immediateContext->PSSetSamplers(0, 1, it->second->GetSamplerState().GetAddressOf());
             m_immediateContext->DrawIndexed(it->second->GetNumIndices(), 0, 0);
         }
 
@@ -416,7 +450,7 @@ namespace library
 
         HRESULT hr = S_OK;
 
-        std::unordered_map<PCWSTR, std::shared_ptr<VertexShader>>::iterator itVertex;
+        std::unordered_map<std::wstring, std::shared_ptr<VertexShader>>::iterator itVertex;
 
         for (auto it = m_renderables.begin(); it != m_renderables.end(); it++) {
             if (it->first == pszRenderableName) {
@@ -446,7 +480,7 @@ namespace library
 
         HRESULT hr = S_OK;
 
-        std::unordered_map<PCWSTR, std::shared_ptr<PixelShader>>::iterator itPixel = m_pixelShaders.begin();
+        std::unordered_map<std::wstring, std::shared_ptr<PixelShader>>::iterator itPixel = m_pixelShaders.begin();
 
         for (auto it = m_renderables.begin(); it != m_renderables.end(); it++) {
             if (it->first == pszRenderableName) {

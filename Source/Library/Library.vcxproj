@@ -113,8 +113,10 @@ copy "$(TargetDir)" "$(SolutionDir)..\Library\x64\Release"</Command>
   <ItemGroup>
     <ClInclude Include="..\Game\Cube\BaseCube.h" />
     <ClInclude Include="..\Game\Cube\CenterCube.h" />
+    <ClInclude Include="..\Game\Cube\Cube.h" />
     <ClInclude Include="..\Game\Cube\CustomCube.h" />
     <ClInclude Include="..\Game\Cube\OrbitCube.h" />
+    <ClInclude Include="..\Game\Cube\TexCube.h" />
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Game\Game.h" />
@@ -125,14 +127,17 @@ copy "$(TargetDir)" "$(SolutionDir)..\Library\x64\Release"</Command>
     <ClInclude Include="Shaders\PixelShader.h" />
     <ClInclude Include="Shaders\Shader.h" />
     <ClInclude Include="Shaders\VertexShader.h" />
+    <ClInclude Include="Texture\DDSTextureLoader.h" />
     <ClInclude Include="Window\BaseWindow.h" />
     <ClInclude Include="Window\MainWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Game\Cube\BaseCube.cpp" />
     <ClCompile Include="..\Game\Cube\CenterCube.cpp" />
+    <ClCompile Include="..\Game\Cube\Cube.cpp" />
     <ClCompile Include="..\Game\Cube\CustomCube.cpp" />
     <ClCompile Include="..\Game\Cube\OrbitCube.cpp" />
+    <ClCompile Include="..\Game\Cube\TexCube.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Renderer\Renderable.cpp" />
@@ -140,6 +145,7 @@ copy "$(TargetDir)" "$(SolutionDir)..\Library\x64\Release"</Command>
     <ClCompile Include="Shaders\PixelShader.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\VertexShader.cpp" />
+    <ClCompile Include="Texture\DDSTextureLoader.cpp" />
     <ClCompile Include="Window\MainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

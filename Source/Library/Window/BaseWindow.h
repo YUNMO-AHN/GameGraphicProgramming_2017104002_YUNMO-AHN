@@ -93,8 +93,8 @@ namespace library
         DerivedType* pThis = NULL;
 
         if (uMsg == WM_NCCREATE) {
-            CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-            pThis = (DerivedType*)pCreate->lpCreateParams;
+            CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
+            pThis = reinterpret_cast<DerivedType*>(pCreate->lpCreateParams);
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pThis);
 
             pThis->m_hWnd = hWnd;
@@ -189,7 +189,7 @@ namespace library
         wcex.cbSize = sizeof(WNDCLASSEX);
         wcex.style = CS_HREDRAW | CS_VREDRAW;
         wcex.lpfnWndProc = DerivedType::WindowProc;
-        wcex.hInstance = GetModuleHandle(NULL);
+        wcex.hInstance = hInstance;
         wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
         wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);

@@ -52,6 +52,12 @@
     <Filter Include="헤더 파일\Camera">
       <UniqueIdentifier>{62a30cf8-f27f-48b2-afc5-df5d7a81167c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Texture">
+      <UniqueIdentifier>{afe1b47e-9465-4863-b903-6c0a6270a070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Texture">
+      <UniqueIdentifier>{ff2bc921-124a-4098-96d6-dcb74f3ceaf6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -102,6 +108,15 @@
     <ClInclude Include="Camera\Camera.h">
       <Filter>헤더 파일\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\DDSTextureLoader.h">
+      <Filter>헤더 파일\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\Cube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Cube\TexCube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\Game.cpp">
@@ -139,6 +154,15 @@
     </ClCompile>
     <ClCompile Include="Camera\Camera.cpp">
       <Filter>소스 파일\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\DDSTextureLoader.cpp">
+      <Filter>소스 파일\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\Cube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Cube\TexCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
