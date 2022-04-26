@@ -116,17 +116,20 @@ copy "$(TargetDir)" "$(SolutionDir)..\Library\x64\Release"</Command>
     <ClInclude Include="..\Game\Cube\Cube.h" />
     <ClInclude Include="..\Game\Cube\CustomCube.h" />
     <ClInclude Include="..\Game\Cube\OrbitCube.h" />
+    <ClInclude Include="..\Game\Cube\RotatingCube.h" />
     <ClInclude Include="..\Game\Cube\TexCube.h" />
+    <ClInclude Include="..\Game\Light\RotatingPointLight.h" />
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Game\Game.h" />
+    <ClInclude Include="Light\PointLight.h" />
     <ClInclude Include="Renderer\DataTypes.h" />
     <ClInclude Include="Renderer\Renderable.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Shaders\PixelShader.h" />
-    <ClInclude Include="Shaders\Shader.h" />
-    <ClInclude Include="Shaders\VertexShader.h" />
+    <ClInclude Include="Shader\PixelShader.h" />
+    <ClInclude Include="Shader\Shader.h" />
+    <ClInclude Include="Shader\VertexShader.h" />
     <ClInclude Include="Texture\DDSTextureLoader.h" />
     <ClInclude Include="Window\BaseWindow.h" />
     <ClInclude Include="Window\MainWindow.h" />
@@ -137,18 +140,22 @@ copy "$(TargetDir)" "$(SolutionDir)..\Library\x64\Release"</Command>
     <ClCompile Include="..\Game\Cube\Cube.cpp" />
     <ClCompile Include="..\Game\Cube\CustomCube.cpp" />
     <ClCompile Include="..\Game\Cube\OrbitCube.cpp" />
+    <ClCompile Include="..\Game\Cube\RotatingCube.cpp" />
     <ClCompile Include="..\Game\Cube\TexCube.cpp" />
+    <ClCompile Include="..\Game\Light\RotatingPointLight.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Light\PointLight.cpp" />
     <ClCompile Include="Renderer\Renderable.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
-    <ClCompile Include="Shaders\PixelShader.cpp" />
-    <ClCompile Include="Shaders\Shader.cpp" />
-    <ClCompile Include="Shaders\VertexShader.cpp" />
+    <ClCompile Include="Shader\PixelShader.cpp" />
+    <ClCompile Include="Shader\Shader.cpp" />
+    <ClCompile Include="Shader\VertexShader.cpp" />
     <ClCompile Include="Texture\DDSTextureLoader.cpp" />
     <ClCompile Include="Window\MainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Game\Shaders\PhongShaders.fxh" />
     <None Include="..\Game\Shaders\Shaders.fxh" />
   </ItemGroup>
   <ItemGroup>

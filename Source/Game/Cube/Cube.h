@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Common.h"
+
 #include "BaseCube.h"
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -24,7 +25,8 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 class Cube : public BaseCube
 {
 public:
-    Cube(const std::filesystem::path& textureFilePath);
+    Cube(_In_ const std::filesystem::path& textureFilePath);
+    Cube(_In_ const XMFLOAT4& outputColor);
     Cube(const Cube& other) = delete;
     Cube(Cube&& other) = delete;
     Cube& operator=(const Cube& other) = delete;

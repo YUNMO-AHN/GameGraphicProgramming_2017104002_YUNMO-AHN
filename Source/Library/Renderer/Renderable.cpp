@@ -1,4 +1,5 @@
 #include "Renderer/Renderable.h"
+#include "Texture/DDSTextureLoader.h"
 
 namespace library
 {
@@ -227,4 +228,24 @@ namespace library
     ComPtr<ID3D11SamplerState>& Renderable::GetSamplerState() {
         return m_samplerLinear;
     }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetOutputColor
+      Summary:  Returns the output color
+      Returns:  const XMFLOAT4&
+                  The output color
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    /*--------------------------------------------------------------------
+      TODO: Renderable::GetOutputColor definition (remove the comment)
+    --------------------------------------------------------------------*/
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::HasTexture
+      Summary:  Returns whether the renderable has texture
+      Returns:  BOOL
+                  Whether the renderable has texture
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    /*--------------------------------------------------------------------
+      TODO: Renderable::HasTexture definition (remove the comment)
+    --------------------------------------------------------------------*/
 }
