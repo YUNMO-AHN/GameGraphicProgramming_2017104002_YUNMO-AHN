@@ -1,27 +1,32 @@
-#include "Renderer/Renderable.h"
-#include "Texture/DDSTextureLoader.h"
+#include "Renderable.h"
+
+#include "assimp/Importer.hpp"	// C++ importer interface
+#include "assimp/scene.h"		// output data structure
+#include "assimp/postprocess.h"	// post processing flags
 
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::Renderable
       Summary:  Constructor
-      Args:     const std::filesystem::path& textureFilePath
-                  Path to the texture to use
+      Args:     const XMFLOAT4* outputColor
+                  Default color of the renderable
       Modifies: [m_vertexBuffer, m_indexBuffer, m_constantBuffer,
                  m_textureRV, m_samplerLinear, m_vertexShader,
-                 m_pixelShader, m_textureFilePath, m_world].
+                 m_pixelShader, m_textureFilePath, m_outputColor,
+                 m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    Renderable::Renderable(_In_ const std::filesystem::path& textureFilePath) :
+    Renderable::Renderable(_In_ const XMFLOAT4& outputColor) :
         m_vertexBuffer(),
         m_indexBuffer(),
         m_constantBuffer(),
-        m_textureRV(),
-        m_samplerLinear(),
         m_vertexShader(),
         m_pixelShader(),
-        m_textureFilePath(textureFilePath),
-        m_world(XMMatrixIdentity())
+        m_outputColor(outputColor),
+        m_world(XMMatrixIdentity()),
+        m_padding(),
+        m_aMeshes(std::vector<BasicMeshEntry>()),
+        m_aMaterials(std::vector<Material>())
     {
     }
 
@@ -87,30 +92,6 @@ namespace library
         if (FAILED(hr)) {
             return hr;
         }
-
-        hr = CreateDDSTextureFromFile(pDevice, m_textureFilePath.filename().wstring().c_str(), nullptr, m_textureRV.GetAddressOf());
-
-        if (FAILED(hr)) {
-            return hr;
-        }
-
-        D3D11_SAMPLER_DESC sampDesc = {
-            .Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
-            .AddressU = D3D11_TEXTURE_ADDRESS_WRAP,
-            .AddressV = D3D11_TEXTURE_ADDRESS_WRAP,
-            .AddressW = D3D11_TEXTURE_ADDRESS_WRAP,
-            .ComparisonFunc = D3D11_COMPARISON_NEVER,
-            .MinLOD = 0,
-            .MaxLOD = D3D11_FLOAT32_MAX
-        };
-
-        hr = pDevice->CreateSamplerState(&sampDesc, m_samplerLinear.GetAddressOf());
-
-        if (FAILED(hr)) {
-            return hr;
-        }
-
-        m_world = XMMatrixIdentity();
 
         return S_OK;
     }
@@ -210,34 +191,14 @@ namespace library
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Renderable::GetTextureResourceView
-      Summary:  Returns the texture resource view
-      Returns:  ComPtr<ID3D11ShaderResourceView>&
-                  The texture resource view
-    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    ComPtr<ID3D11ShaderResourceView>& Renderable::GetTextureResourceView() {
-        return m_textureRV;
-    }
-
-    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Renderable::GetSamplerState
-      Summary:  Returns the sampler state
-      Returns:  ComPtr<ID3D11SamplerState>&
-                  The sampler state
-    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    ComPtr<ID3D11SamplerState>& Renderable::GetSamplerState() {
-        return m_samplerLinear;
-    }
-
-    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::GetOutputColor
       Summary:  Returns the output color
       Returns:  const XMFLOAT4&
                   The output color
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    /*--------------------------------------------------------------------
-      TODO: Renderable::GetOutputColor definition (remove the comment)
-    --------------------------------------------------------------------*/
+    const XMFLOAT4& Renderable::GetOutputColor() const {
+        return m_outputColor;
+    }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::HasTexture
@@ -245,7 +206,132 @@ namespace library
       Returns:  BOOL
                   Whether the renderable has texture
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    /*--------------------------------------------------------------------
-      TODO: Renderable::HasTexture definition (remove the comment)
-    --------------------------------------------------------------------*/
+    BOOL Renderable::HasTexture() const {
+        if (!m_aMaterials.empty()) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetMaterial
+      Summary:  Returns a material at given index
+      Returns:  const Material&
+                  Material at given index
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    const Material& Renderable::GetMaterial(UINT uIndex) const
+    {
+        assert(uIndex < m_aMaterials.size());
+
+        return m_aMaterials[uIndex];
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetMesh
+      Summary:  Returns a basic mesh entry at given index
+      Returns:  const Renderable::BasicMeshEntry&
+                  Basic mesh entry at given index
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    const Renderable::BasicMeshEntry& Renderable::GetMesh(UINT uIndex) const
+    {
+        assert(uIndex < m_aMeshes.size());
+
+        return m_aMeshes[uIndex];
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::RotateX
+      Summary:  Rotates around the x-axis
+      Args:     FLOAT angle
+                  Angle of rotation around the x-axis, in radians
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::RotateX(_In_ FLOAT angle) {
+        m_world *= XMMatrixRotationX(angle);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::RotateY
+      Summary:  Rotates around the y-axis
+      Args:     FLOAT angle
+                  Angle of rotation around the y-axis, in radians
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::RotateY(_In_ FLOAT angle) {
+        m_world *= XMMatrixRotationY(angle);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::RotateZ
+      Summary:  Rotates around the z-axis
+      Args:     FLOAT angle
+                  Angle of rotation around the z-axis, in radians
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::RotateZ(_In_ FLOAT angle) {
+        m_world *= XMMatrixRotationZ(angle);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::RotateRollPitchYaw
+      Summary:  Rotates based on a given pitch, yaw, and roll (Euler angles)
+      Args:     FLOAT pitch
+                  Angle of rotation around the x-axis, in radians
+                FLOAT yaw
+                  Angle of rotation around the y-axis, in radians
+                FLOAT roll
+                  Angle of rotation around the z-axis, in radians
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::RotateRollPitchYaw(_In_ FLOAT pitch, _In_ FLOAT yaw, _In_ FLOAT roll) {
+        m_world *= XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::Scale
+      Summary:  Scales along the x-axis, y-axis, and z-axis
+      Args:     FLOAT scaleX
+                  Scaling factor along the x-axis.
+                FLOAT scaleY
+                  Scaling factor along the y-axis.
+                FLOAT scaleZ
+                  Scaling factor along the z-axis.
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::Scale(_In_ FLOAT scaleX, _In_ FLOAT scaleY, _In_ FLOAT scaleZ) {
+        m_world *= XMMatrixScaling(scaleX, scaleY, scaleZ);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::Translate
+      Summary:  Translates matrix from a vector
+      Args:     const XMVECTOR& offset
+                  3D vector describing the translations along the x-axis, y-axis, and z-axis
+      Modifies: [m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderable::Translate(_In_ const XMVECTOR& offset) {
+        m_world *= XMMatrixTranslationFromVector(offset);
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetNumMeshes
+      Summary:  Returns the number of meshes
+      Returns:  UINT
+                  Number of meshes
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    UINT Renderable::GetNumMeshes() const
+    {
+        return static_cast<UINT>(m_aMeshes.size());
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetNumMaterials
+      Summary:  Returns the number of materials
+      Returns:  UINT
+                  Number of materials
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    UINT Renderable::GetNumMaterials() const
+    {
+        return static_cast<UINT>(m_aMaterials.size());
+    }
 }
