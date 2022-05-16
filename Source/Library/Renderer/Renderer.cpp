@@ -447,6 +447,46 @@ namespace library
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::AddScene
+      Summary:  Add a scene
+      Args:     PCWSTR pszSceneName
+                  Key of a scene
+                const std::filesystem::path& sceneFilePath
+                  File path to initialize a scene
+      Modifies: [m_scenes].
+      Returns:  HRESULT
+                  Status code
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    HRESULT Renderer::AddScene(_In_ PCWSTR pszSceneName, const std::filesystem::path& sceneFilePath) {
+        for (auto it = m_scenes.begin(); it != m_scenes.end(); it++) {
+            if (it->first == pszSceneName) {
+                return E_FAIL;
+            }
+        }
+
+        std::shared_ptr<Scene> scene = std::make_shared<Scene>(sceneFilePath);
+        m_scenes.insert(std::pair<std::wstring, std::shared_ptr<Scene>>(pszSceneName, scene));
+
+        return S_OK;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::SetMainScene
+      Summary:  Set the main scene
+      Args:     PCWSTR pszSceneName
+                  Name of the scene to set as the main scene
+      Modifies: [m_pszMainSceneName].
+      Returns:  HRESULT
+                  Status code
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    HRESULT Renderer::SetMainScene(_In_ PCWSTR pszSceneName) {
+
+        m_pszMainSceneName = pszSceneName;
+
+        return S_OK;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderer::HandleInput
       Summary:  Add the pixel shader into the renderer and initialize it
       Args:     const DirectionsInput& directions
@@ -608,6 +648,66 @@ namespace library
                 for (itPixel = m_pixelShaders.begin(); itPixel != m_pixelShaders.end(); itPixel++) {
                     if (itPixel->first == pszPixelShaderName) {
                         it->second->SetPixelShader(itPixel->second);
+                    }
+                }
+            }
+        }
+
+        return S_OK;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::SetVertexShaderOfScene
+      Summary:  Sets the vertex shader for the voxels in a scene
+      Args:     PCWSTR pszSceneName
+                  Key of the scene
+                PCWSTR pszVertexShaderName
+                  Key of the vertex shader
+      Modifies: [m_scenes].
+      Returns:  HRESULT
+                  Status code
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    HRESULT Renderer::SetVertexShaderOfScene(_In_ PCWSTR pszSceneName, _In_ PCWSTR pszVertexShaderName) {
+
+        std::unordered_map<std::wstring, std::shared_ptr<VertexShader>>::iterator itVertex;
+
+        for (auto it = m_scenes.begin(); it != m_scenes.end(); it++) {
+            if (it->first == pszSceneName) {
+                for (itVertex = m_vertexShaders.begin(); itVertex != m_vertexShaders.end(); itVertex++) {
+                    if (itVertex->first == pszVertexShaderName) {
+                        for (std::vector<Voxel>::size_type i = 0; i < it->second->GetVoxels().size(); i++) {
+                            it->second->GetVoxels()[i]->SetVertexShader(itVertex->second);
+                        }
+                    }
+                }
+            }
+        }
+
+        return S_OK;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::SetPixelShaderOfScene
+      Summary:  Sets the pixel shader for the voxels in a scene
+      Args:     PCWSTR pszRenderableName
+                  Key of the renderable
+                PCWSTR pszPixelShaderName
+                  Key of the pixel shader
+      Modifies: [m_renderables].
+      Returns:  HRESULT
+                  Status code
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    HRESULT Renderer::SetPixelShaderOfScene(_In_ PCWSTR pszSceneName, _In_ PCWSTR pszPixelShaderName) {
+
+        std::unordered_map<std::wstring, std::shared_ptr<PixelShader>>::iterator itPixel = m_pixelShaders.begin();
+
+        for (auto it = m_scenes.begin(); it != m_scenes.end(); it++) {
+            if (it->first == pszSceneName) {
+                for (itPixel = m_pixelShaders.begin(); itPixel != m_pixelShaders.end(); itPixel++) {
+                    if (itPixel->first == pszPixelShaderName) {
+                        for (std::vector<Voxel>::size_type i = 0; i < it->second->GetVoxels().size(); i++) {
+                            it->second->GetVoxels()[i]->SetPixelShader(itPixel->second);
+                        }
                     }
                 }
             }

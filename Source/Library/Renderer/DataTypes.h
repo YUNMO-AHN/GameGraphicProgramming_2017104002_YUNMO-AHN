@@ -21,6 +21,16 @@ namespace library
     };
 
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
+      Struct:   InstanceData
+      Summary:  Instance data containing a per instance transformation
+                matrix
+    S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S-S*/
+    struct InstanceData
+    {
+        XMMATRIX Transformation;
+    };
+
+    /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
       Struct:   CBChangeOnCameraMovement
       Summary:  Constant buffer containing view matrix
     S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S-S*/
